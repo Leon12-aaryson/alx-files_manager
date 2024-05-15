@@ -1,4 +1,5 @@
-const { MongoClient } = require('mongodb');
+// const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
 /**
  * Represents a MongoDB client.
@@ -20,12 +21,11 @@ class DBClient {
     this.client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
     // Connect to MongoDB
-    this.client.connect((err) => {
-      if (err) {
-        console.error('MongoDB connection error:', err);
-      } else {
-        console.log('Connected to MongoDB');
-      }
+
+    this.client.connect().then(() => {
+      console.log('Connected to MongoDB');
+    }).catch(err => {
+      console.error('MongoDB connection error:', err);
     });
   }
 
@@ -34,7 +34,8 @@ class DBClient {
    * @returns {boolean} - True if the connection is active, otherwise false.
    */
   isAlive() {
-    return !!this.client && this.client.isConnected();
+    // Check if the client is connected by examining the readyState property
+    return this.client.readyState === 2; // 2 represents 'connected'
   }
 
   /**
@@ -71,5 +72,6 @@ class DBClient {
 }
 
 // Create and export an instance of DBClient
-const dbClient = new DBClient();
-module.exports = dbClient;
+const dbClientInsatance = new DBClient();
+// module.exports.default = dbClient;
+export default dbClientInsatance;
