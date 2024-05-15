@@ -1,0 +1,22 @@
+{
+  "name": "alx-files_manager",
+  "version": "1.0.0",
+  "description": "### Resources - [Node JS getting started](https://nodejs.org/en/learn/getting-started/introduction-to-nodejs) - [Process API doc](https://node.readthedocs.io/en/latest/api/process/) - [Express getting started](https://expressjs.com/en/starter/installing.html) - [Mocha documentation](https://mochajs.org/) - [Nodemon documentation](https://github.com/remy/nodemon#nodemon) - [MongoDB](https://github.com/mongodb/node-mongodb-native) - [Bull](https://github.com/OptimalBits/bull) - [Image thumbnail](https://www.npmjs.com/package/image-thumbnail) - [Mime-Types](https://www.npmjs.com/package/mime-types) - [Redis](https://github.com/redis/node-redis)",
+  "main": "server.js",
+  "scripts": {
+    "test": "nodemon",
+    "start": "node server.js",
+    "dev": "node"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "^3.1.0",
+    "redis": "^4.6.13"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.2.0",
+    "eslint": "^9.2.0",
+    "globals": "^15.2.0"
+  }
+}
