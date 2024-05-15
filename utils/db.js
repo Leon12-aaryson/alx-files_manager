@@ -1,5 +1,4 @@
-import mongodb from 'mongodb';
-import envLoader from './env_loader';
+const { MongoClient } = require('mongodb');
 
 /**
  * Represents a MongoDB client.
@@ -10,26 +9,20 @@ class DBClient {
    * Initializes a MongoDB client with the provided environment variables or default values.
    */
   constructor() {
-    envLoader();
+    // Obtain host, port, and database from environment variables or use defaults
     const host = process.env.DB_HOST || 'localhost';
     const port = process.env.DB_PORT || 27017;
     const database = process.env.DB_DATABASE || 'files_manager';
-    const dbURL = `mongodb://${host}:${port}/${database}`;
 
-    this.client = new mongodb.MongoClient(dbURL, { useUnifiedTopology: true });
+    // Construct MongoDB connection URI
+    const uri = `mongodb://${host}:${port}/${database}`;
+    // Create a new MongoClient instance
+    this.client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
     // Connect to MongoDB
-    this.connect();
-  }
-
-  /**
-   * Connects to the MongoDB server.
-   * Logs any errors that occur during the connection process.
-   */
-  connect() {
     this.client.connect((err) => {
       if (err) {
-        console.error('Error connecting to MongoDB:', err);
+        console.error('MongoDB connection error:', err);
       } else {
         console.log('Connected to MongoDB');
       }
@@ -37,58 +30,46 @@ class DBClient {
   }
 
   /**
-   * Checks if this client's connection to
-   * MongoDB server is active.
+   * Checks if this client's connection to MongoDB server is active.
    * @returns {boolean} - True if the connection is active, otherwise false.
    */
   isAlive() {
-    return this.client.isConnected();
+    return !!this.client && this.client.isConnected();
   }
 
   /**
-   * Retrieves the number of users in the database.
-   * @returns {Promise<Number>} - A promise that resolves to the number of users.
+   * Retrieves the number of documents in the `users` collection.
+   * @returns {Promise<number>} - A promise that resolves to the number of documents in the `users` collection.
    */
   async nbUsers() {
-    try {
-      const usersCollection = this.client.db().collection('users');
-      return await usersCollection.countDocuments();
-    } catch (error) {
-      console.error('Error retrieving number of users:', error);
+    if (!this.isAlive()) {
       return 0;
     }
+
+    // Access the `users` collection and retrieve the count of documents
+    const db = this.client.db();
+    const usersCollection = db.collection('users');
+    const count = await usersCollection.countDocuments();
+    return count;
   }
 
   /**
-   * Retrieves the number of files in the database.
-   * @returns {Promise<Number>} - A promise that resolves to the number of files.
+   * Retrieves the number of documents in the `files` collection.
+   * @returns {Promise<number>} - A promise that resolves to the number of documents in the `files` collection.
    */
   async nbFiles() {
-    try {
-      const filesCollection = this.client.db().collection('files');
-      return await filesCollection.countDocuments();
-    } catch (error) {
-      console.error('Error retrieving number of files:', error);
+    if (!this.isAlive()) {
       return 0;
     }
-  }
 
-  /**
-   * Retrieves a reference to the `users` collection.
-   * @returns {Promise<Collection>} - A promise that resolves to the `users` collection.
-   */
-  async usersCollection() {
-    return this.client.db().collection('users');
-  }
-
-  /**
-   * Retrieves a reference to the `files` collection.
-   * @returns {Promise<Collection>} - A promise that resolves to the `files` collection.
-   */
-  async filesCollection() {
-    return this.client.db().collection('files');
+    // Access the `files` collection and retrieve the count of documents
+    const db = this.client.db();
+    const filesCollection = db.collection('files');
+    const count = await filesCollection.countDocuments();
+    return count;
   }
 }
 
+// Create and export an instance of DBClient
 const dbClient = new DBClient();
-export default dbClient;
+module.exports = dbClient;
